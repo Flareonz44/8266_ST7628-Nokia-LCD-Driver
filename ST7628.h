@@ -74,3 +74,37 @@
 #define 8266_ST7628_MAGENTA    0xF81F
 #define 8266_ST7628_YELLOW     0xFFE0  
 #define 8266_ST7628_WHITE      0xFFFF
+
+class ST7628 : public Adafruit_GFX {
+    public:
+    ST7628(int8_t CS /*Chip Select*/, int8_t MOSI /*Master Out Slave In*/, int8_t SCLK /*Slave CLocK*/, int8_t RST /*ReSeT*/);
+    void init(void),
+        setAddrWindow(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1),
+        pushColor(uint16_t color),
+        fillScreen(uint16_t color),
+        drawPixel(int16_t x, int16_t y, uint16_t color),
+        drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color),
+        drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color),
+        fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color),
+        setRotation(uint8_t r),
+        invertDisplay(boolean i);
+    uint16_t Color565(uint8_t r, uint8_t g, uint8_t b);
+
+    private:
+    uint8_t  tabcolor;
+    void     spiwrite(uint8_t),
+        writecommand(uint8_t c),
+        writedata(uint8_t d),
+        commandList(const uint8_t *addr),
+        commonInit(const uint8_t *cmdList);
+
+#if defined(ESP8266)
+  volatile uint32_t *dataport, *clkport, *csport;
+  uint32_t  _cs, _rst, _sid, _sclk,
+             datapinmask, clkpinmask, cspinmask, rspinmask,
+             colstart, rowstart;
+#endif // for ESP8266
+  
+};
+
+#endif // the entire header
