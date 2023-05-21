@@ -77,7 +77,7 @@
 
 class ST7628 : public Adafruit_GFX {
     public:
-    ST7628(int8_t CS /*Chip Select*/, int8_t MOSI /*Master Out Slave In*/, int8_t SCLK /*Slave CLocK*/, int8_t RST /*ReSeT*/);
+    ST7628(int8_t CS /*Chip Select*/, int8_t RST /*ReSeT*/);
     void      init(void);
     void      setAddrWindow(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1);
     void      pushColor(uint16_t color);
