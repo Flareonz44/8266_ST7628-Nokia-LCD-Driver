@@ -1,12 +1,12 @@
 //includes
-#include <Adafruit_GFX.h>                                               //graphics
-#include <ST7628.h>                                                     //definitions and etc
+#include <Adafruit_GFX.h>                                               // graphics
+#include <ST7628.h>                                                     // definitions and etc
 //#include <limits.h> //??
-#include <pgmspace.h>                                                   //memory management
-#include <SPI.h>                                                        //handle SPI interface
+#include <pgmspace.h>                                                   // access flash memory during runtime
+#include <SPI.h>                                                        // handle SPI interface
 
 //swap colors
-inline uint16_t swapcolor(uint16_t x) {                                 //inline for performance improvement
+inline uint16_t swapcolor(uint16_t x) {                                 // inline for performance improvement
   return (x << 11) | (x & 0x07E0) | (x >> 11);
 }
 
@@ -69,6 +69,62 @@ void 8266_ST7628::commandList(const uint8_t *addr){
           if(ms == 255) ms = 500;                                       // since each item is 8bit long, the max number possible is 255, so if ms == 255 => set ms to 500ms
           delay(ms);                                                    // delay, just that
         }
+    }
+}
+
+// common initialization of displays
+void 8266_ST7628::commonInit(const uint8_t *cmdList){
+    _colStart = _rowStart = 0;                                          // calibrate origin, maybe
+    pinMode(_cs, OUTPUT);                                               // setup chip select
+    digitalWrite(_cs, HIGH);                                            // disable LCD (wont react to SPI pins status)
+    if (_rst){                                                          // if user provides a reset pin, reset LCD
+        pinMode(_rst, OUTPUT);                                          // -|
+        digitalWrite(_rst, HIGH);                                       //  |
+        delay(500);                                                     //  |
+        digitalWrite(_rst, LOW);                                        //  |-> LCD RESET
+        delay(500);                                                     //  |
+        digitalWrite(_rst, HIGH);                                       //  |
+        delay(500);                                                     // -|
+    }
+    if(cmdList) commandList(cmdList);                                   // run init command list
+}
+
+// initialization of ST7628 LCD
+void 8266_ST7628::init(void){
+    commonInit(initComList);                                            // pass ouw command list we define above
+}
+
+// set workspace
+void 8266_ST7628::setAddrWindow(uint8_t x0, uint8_t x1, uint8_t y0, uint8_t y1){
+    writeCommand(8266_ST7628_CASET);                                    // Column Address SET
+    writeData(x0+_colStart);                                            // XSTART 
+    writeData(x1+_colStart);                                            // XEND
+    writeCommand(8266_ST7628_RASET);                                    // Row Address SET
+    writeData(y0+_rowStart);                                            // YSTART
+    writeData(y1+_rowStart);                                            // YEND
+    writeCommand(8266_ST7628_RAMWR);                                    // write to LCD RAM
+}
+
+// send color to LCD
+inline void 8266_ST7628::pushColor(uint16_t color){                     //pretty simple: the LCD data bus is 8bit long, and color is 16bit long,
+    writeData(color >> 8);                                              //  so data color should be SPL\
+    writeData(color);                                                   //                            \ITED
+}
+
+// draws exactly one pixel
+void 8266_ST7628::drawPixel(int16_t x, int16_t x, uint16_t color){
+    if((x < 0) ||(x >= _width) || (y < 0) || (y >= _height)) return;    // check pixel is within limits
+    setAddrWindow(x,y,x,y);                                             // set workspace
+    pushColor(color);                                                   // send color data
+}
+
+// draw a vertical line as fast as possible
+void 8266_ST7628::drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color){
+    if((x >= _width) || (y >= _height)) return;                         // check origin inside bounds
+    if((y+h-1) >= _height) h = _height-y;                               // check endline inside bounds, if out, clip it
+    setAddrWindow(x, y, x, y+h-1);                                      // set workspace
+    while(h--){                                                         // for each pixel in height (h)
+        pushColor(color);                                               // send color data
     }
 }
 
