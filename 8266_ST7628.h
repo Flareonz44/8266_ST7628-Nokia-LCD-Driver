@@ -97,7 +97,6 @@ class 8266_ST7628 : public Adafruit_GFX {
     void     writedata(uint8_t d);
     void     commandList(const uint8_t *addr);
     void     commonInit(const uint8_t *cmdList);
-
     uint8_t  _cs, _rst, _colStart, _rowStart;
 };
 
