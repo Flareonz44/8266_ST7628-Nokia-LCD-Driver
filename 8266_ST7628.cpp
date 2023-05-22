@@ -1,7 +1,6 @@
 //includes
 #include <Adafruit_GFX.h>                                               // graphics
 #include <ST7628.h>                                                     // definitions and etc
-//#include <limits.h> //??
 #include <pgmspace.h>                                                   // access flash memory during runtime
 #include <SPI.h>                                                        // handle SPI interface
 

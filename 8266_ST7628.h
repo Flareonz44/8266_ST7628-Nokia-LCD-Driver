@@ -6,8 +6,8 @@
 #include <Adafruit_GFX.h>
 
 //some definitions
-#define 8266_ST7628_TFTWIDTH   97        // 98?
-#define 8266_ST7628_TFTHEIGHT  69        // 70?
+#define 8266_ST7628_TFTWIDTH   97        // 98 is max
+#define 8266_ST7628_TFTHEIGHT  69        // 70 is max
 
 #define 8266_ST7628_NOP        0x00
 #define 8266_ST7628_SWRESET    0x01
