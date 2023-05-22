@@ -6,8 +6,8 @@
 #include <Adafruit_GFX.h>
 
 //some definitions
-#define 8266_ST7628_TFTWIDTH  97
-#define 8266_ST7628_TFTHEIGHT 69
+#define 8266_ST7628_TFTWIDTH   97        // 98?
+#define 8266_ST7628_TFTHEIGHT  69        // 70?
 
 #define 8266_ST7628_NOP        0x00
 #define 8266_ST7628_SWRESET    0x01
@@ -75,9 +75,9 @@
 #define 8266_ST7628_YELLOW     0xFFE0  
 #define 8266_ST7628_WHITE      0xFFFF
 
-class ST7628 : public Adafruit_GFX {
+class 8266_ST7628 : public Adafruit_GFX {
     public:
-    ST7628(int8_t CS /*Chip Select*/, int8_t RST /*ReSeT*/);
+    8266_ST7628(int8_t CS /*Chip Select*/, int8_t RST /*ReSeT*/);
     void      init(void);
     void      setAddrWindow(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1);
     void      pushColor(uint16_t color);
@@ -98,10 +98,7 @@ class ST7628 : public Adafruit_GFX {
     void     commandList(const uint8_t *addr);
     void     commonInit(const uint8_t *cmdList);
 
-    #if defined(ESP8266)
-    volatile uint32_t *dataport, *clkport, *csport;
-    uint32_t  _cs, _rst, _sid, _sclk, datapinmask, clkpinmask, cspinmask, rspinmask, colstart, rowstart;
-    #endif // for definition ESP8266
+    uint8_t  _cs, _rst, _colStart, _rowStart;
 };
 
 #endif // for the entire header
