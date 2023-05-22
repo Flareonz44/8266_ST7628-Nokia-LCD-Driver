@@ -128,3 +128,81 @@ void 8266_ST7628::drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color)
     }
 }
 
+// same as previous, but horizontal
+void 8266_ST7628::drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color){
+    if((x >= _width) || (y >= _height)) return;                         // check origin inside bounds
+    if((x+w-1) >= _width) w = _width-x;                                 // check endline inside bounds, if out, clip it
+    setAddrWindow(x, y, x+w-1, y);                                      // set workspace
+    while(w--){                                                         // for each pixel in width (w)
+        pushColor(color);                                               // send color data
+    }
+}
+
+// fill the entire screen
+void 8266_7628::fillScreen(uint16_t color){
+    fillRect(0, 0, _width, _height, color);
+}
+
+// fill the specified rectangle
+void 8266_7628::fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color){
+    if((x >= _width) || (y >= _height)) return;                         // check inside bounds
+    if((x + w - 1) >= _width)  w = _width  - x;                         // check width bounds
+    if((y + h - 1) >= _height) h = _height - y;                         // check height bounds
+    setAddrWindow(x, y, x+w, y+h);
+    for(y=h; y>=0; y--){                                                // interesting way of for loop
+        for(x=w; x>=0; x--){                                            // doesnt use extra memory, just recicle previous variables
+            pushColor(color);                                           // send color data
+        }
+    }
+}
+
+// converts 24bit color to 16bit color
+uint16_t 8266_ST7628::Color565(uint8_t r, uint8_t g, uint8_t b) {
+    return ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3);
+}
+
+// some constants to define rotation data
+#define MADCTL_MY  0x80
+#define MADCTL_MX  0x40
+#define MADCTL_MV  0x20
+#define MADCTL_ML  0x10
+#define MADCTL_RGB 0x00
+#define MADCTL_BGR 0x08
+#define MADCTL_MH  0x04
+
+// function to update variables based on rotation
+// 0 -> no rotation
+// 1 -> 90  deg CW
+// 2 -> 180 deg CW
+// 3 -> 90  deg CCW
+void 8266_ST7628::setRotation(uint8_t m) {
+    writeCommand(8266_ST7628_MADCTL);
+    rotation = m % 4;                                                   // can't be higher than 3 options
+    switch (rotation) {
+        case 0:
+            writeData(MADCTL_MX | MADCTL_MY | MADCTL_RGB);
+            _width  = 8266_ST7628_TFTWIDTH;
+            _height = 8266_ST7628_TFTHEIGHT;
+            break;
+        case 1:
+            writeData(MADCTL_MY | MADCTL_MV | MADCTL_RGB);
+            _width  = 8266_ST7628_TFTHEIGHT;
+            _height = 8266_ST7628_TFTWIDTH;
+            break;
+        case 2:
+            writeData(MADCTL_RGB);
+            _width  = 8266_ST7628_TFTWIDTH;
+            _height = 8266_ST7628_TFTHEIGHT;
+            break;
+        case 3:
+            writedata(MADCTL_MX | MADCTL_MV | MADCTL_RGB);
+            _width  = 8266_ST7628_TFTHEIGHT;
+            _height = 8266_ST7628_TFTWIDTH;
+            break;
+    }
+}
+
+// this will invert the display
+void 8266_ST7628::invertDisplay(boolean i) {
+    writeCommand(i ? 8266_ST7628_INVON : 8266_ST7628_INVOFF);
+}
