@@ -6,7 +6,7 @@ This is a port of the original driver created by [Tapia Favio for Arduino](https
 
 Wiring diagram:
 
-![image](https://github.com/Flareonz44/8266_ST7628-Nokia-LCD-Driver/assets/72309928/1b520765-a685-4188-9542-71b472ca6f73)
+![image](https://github.com/Flareonz44/8266_ST7628-Nokia-LCD-Driver/assets/72309928/da3e05b9-85af-4878-a2dd-220ea1e34a96)
 
 # Important!
 Sadly, this project is on hold as it's impossible to find an SSOP-to-DIP adapter for this screen (soldering is not an option). Sparkfun used to provide this, but that product is no longer available. I've done everything I can, but since it's impossible to test it, this project will remain paused.
